@@ -1,0 +1,10 @@
+Redirects to a Real URl
+
+---
+
+tags:
+  - Bookmarks
+parameters:
+  - in : path
+    name : short_url  
+    required : true

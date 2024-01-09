@@ -1,0 +1,172 @@
+Code Guide For REST API _
+_init__.py:
+    # Anythin we import from source we'll get them directly 
+    # Also called factory function
+    # From this file , fn can be called directly depending upon how we call them
+    # Good for Application initialization
+
+    # Property Of JWT Extended 
+    # JWT allows us to create tokens without maintaining the db. It just do all the stuff by sime encryption techniques that is based on the secret key , by using this we can encode user's information into a token
+
+
+    # The instance_relative_config=True parameter tells Flask to look for configuration files in the instance folder, which allows you to 
+    # have separate configuration files for different environments.
+
+    # instance of flask app
+    
+    # If none then It could be used for testing purposes or to provide custom configurations for different environments (e.g., development, production).
+
+    #   The os.environ attribute is a dictionary-like object containing the current environment variables.
+    
+    # to secure cookies, session data, and other cryptographic operations. It's often used for generating secure tokens, preventing cross-site request forgery (CSRF) attacks etc
+
+    # When passed with test_config : This allows you to pass specific configuration settings when testing the application.
+
+     # setting it to false, then sqlalchemy won't track changes to objects 
+
+    # They are commonly used for authentication purposes, allowing users to securely log in and access protected resources.
+
+    # registering db
+
+    # Linking the app with jwt so that when we return it knows that jwt is configured 
+
+    # registering blueprints
+
+    # http://127.0.0.1:5000/6rK
+
+    # here the url will be the original one
+    
+    # API Error Handling 
+
+auth.py : 
+    # defining blueprint
+    # In Flask, a Blueprint is a way to organize and structure a large web application into smaller and more manageable components. It allows you to define routes, views, templates, static files, and other application components in a modular and reusable manner.
+
+
+    # we're trying to get the data in json (dict) where username is key and contains a value in return 
+    
+    # username validation
+
+    # password validation
+
+    # email validation
+
+    # Data Storage
+
+    # these are the keys , we will send to the frontend
+    # we use get as get allows us to specify fallback value i.e when there is no value we can return '', and also to protect from server crash
+    
+    # we have encrypted password , but user gives us in a plain text , then to check we'll use check_password_hash
+
+    # these access/refresh tokens takes argument as user_id , and we can also give some other features
+
+    # 'access':access,  # we've used access token to protect end points i.e , so the data with url don't show the details
+    
+    # @jwt_required() # authentication required
+
+    # user_id = get_jwt_identity()   # it'll give user id
+
+    # @jwt_required(refresh=True)  # user would give refresh token then it would start this function
+
+    #  identity = get_jwt_identity()  # id
+
+database.py : 
+    # db = SQLAlchemy() # now we've access to model class
+
+    # specify database uri , mentioned in .flaskenv and config it by mentioning in __init__.py and then register our db with our app
+
+    # backref is yet another way of defining reverse relationship
+    # It implies that each user can have multiple bookmarks associated with them
+    
+    # built-in method for String representation / TO show
+
+    # def __repr__(self) -> str:
+        return 'User>>> {self.username}'  # It takes self as the first parameter, which refers to the instance of the class itself. 
+                                          # self.username is a placeholder that that is replaced with the actual value when repr is called
+    
+    # Following One-to-Many Relationship
+
+        # connection between user and bookmarks
+        # we define user to connect user and bookmarks and user.id to check with it's speciific column
+        user_id = db.Column(db.Integer , db.ForeignKey('user.id'))
+       
+     
+    # for short url generating random numbers
+    # string.digits = 0-9
+    # string.ascii_letters = a-z and A-Z
+    # random.choices will return empty string to overcome we use .join
+
+    # we've to make sure that picked_chars don't exist already in db so our link tracking won't work
+    # short_url is itself nothing although we made it equal to picked chars that is previously not present in db
+    
+    # if it exist we've to record it again and again until it gets the unique one
+
+    
+        
+    # Our task is to create a short url for the given url
+    # Whenever object is created / called the constructor gets called so we are over-riding it here
+    # In db it will be saved as short url but when it is called at runtime the func of gen.short.url will be called 
+    
+    # The constructor first calls the constructor of the parent class (in this case, super().__init__(**kwargs)), which allows the parent class (likely db.Model) to handle its initialization process, including setting the values of any fields passed through **kwargs.
+    # After calling the parent constructor, it then calls self.generate_short_characters() to generate a short URL for the bookmark. The generated short URL is then assigned to the self.short_url attribute, which corresponds to the short_url column in the Bookmark table
+    
+    # ** kwargs : It means that the function can accept any number of keyword arguments, and those arguments will be collected into a dictionary where the keys are the argument names and the values are the corresponding argument values
+    # The whole story is : due to **kwargs we can pass multiple keyword arguments of our choice as mentioned above
+    
+     # kwargs -- keyword arguments 
+
+bookmarks.py:
+    
+    # Posting The Records
+
+
+    # else:
+
+        # Process for getting the data page wise ---> pagination
+        # get('page', 1, type=int): This method is used to get the value of a query parameter named 'page' from the query string. It takes three arguments:
+
+        # The name of the query parameter ('page' in this case).
+        # The default value to use if the query parameter is not present in the URL (1 in this case).
+        # The data type to convert the value to (int in this case).
+        # So, what this line of code does is:
+
+        # It attempts to retrieve the value of the 'page' query parameter from the URL's query string.
+        # If the 'page' query parameter is not present, it will default to the value 1.
+        # It will attempt to convert the retrieved value (or the default value) to an integer (type=int).
+        # For example, if your URL is something like http://example.com/some-route?page=2, the page variable will be assigned the value 2. If the 'page' query parameter is not present in the URL, it will be assigned the default value of 1.
+
+    #    page = request.args.get('page',1,type=int) # ...?page=..
+    # Pagination metadata
+
+        meta = {
+            'page':bookmark_pagination.page,
+            'pages':bookmark_pagination.pages,
+            'total_count': bookmark_pagination.total, # total_count': The total number of items in the original query result (not just the current page)
+            'prev_page':bookmark_pagination.prev_num, # The page number of the previous page. If there is no previous page, this value will be None.
+            'next_page':bookmark_pagination.next_num, # The page number of the next page. If there is no next page, this value will be None.
+            'has_next':bookmark_pagination.has_next, # 'has_next': A boolean indicating whether there is a next page (True if there is, False if not).
+            'has_prev':bookmark_pagination.has_prev, # has_prev': A boolean indicating whether there is a previous page (True if there is, False if not).
+            
+  
+    # current_user = get_jwt_identity()
+
+    # This part adds filtering conditions to the query. It specifies that you want to retrieve a bookmark where the user_id column matches the value of current_user and the id column matches the value of id. 
+    # SO the whole story is that if someone want to retrieve a bookmark where the user_id = current_user and current_user comes up with the jwt(user id) that is authenticated at that time 
+    # id = id : It specifies that you are looking for a bookmark with a specific ID value.
+
+        # bookmark = Bookmark.query.filter_by(user_id = current_user, id=id).first()
+
+    # current_user = get_jwt_identity()
+
+
+    # This line queries the database for a bookmark based on the provided id and the current user's ID. If a bookmark with the specified ID and owned by the current user is found, it's returned; otherwise, None is returned.
+
+    # bookmark = Bookmark.query.filter_by(user_id = current_user, id = id).first()
+
+        
+    # here it got the updated url 
+
+        # bookmark.url = url
+        # bookmark.body = body
+
+    # items = Bookmark.query.filter_by(user_id = current_user).all() # will return all the values of the query
